@@ -5,9 +5,35 @@ import "antd/dist/antd.css";
 import axios from "axios";
 import "./styles.css";
 
+const apiKey = 'ckey_4ed95a4079be4cbfac28f761699';
+
 function getRequestUrl(chainId, address) {
-  return `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/?&key=ckey_f0c909ff7e964c99919b15ae7f8`;
+  return `https://api.covalenthq.com/v1/${chainId}/address/${address}/balances_v2/?&key=${apiKey}`;
 }
+
+const CardItem = ({ item }) => {
+  const balance = ethers.utils.formatUnits(
+    item.balance,
+    item.contract_decimals
+  );
+  return (
+    <Col span={8} key={item.contract_address}>
+      <Card
+        title={
+          <div>
+            <Avatar src={item?.logo_url} style={{ margin: "0 10px" }} />
+            <span>{item?.contract_ticker_symbol}</span>
+          </div>
+        }
+      >
+        <p>{`contract: ${item?.contract_address}`}</p>
+        <p>{`balance: ${balance}`}</p>
+        <p>{`rate: ${item?.quote_rate}`}</p>
+        <p>{`balance usd: ${item?.quote}`}</p>
+      </Card>
+    </Col>
+  );
+};
 
 export default function App() {
   const [form] = Form.useForm();
@@ -18,6 +44,7 @@ export default function App() {
   const onReset = () => {
     form.resetFields();
     setEthData(null);
+    setBscData(null);
   };
 
   const onFinish = (values) => {
@@ -35,6 +62,8 @@ export default function App() {
         console.log(error);
       });
   };
+
+  console.log(bscData);
 
   return (
     <div>
@@ -75,24 +104,7 @@ export default function App() {
           {ethData?.items && ethData.items.length > 0 && (
             <Row gutter={16}>
               {ethData.items.map((item) => (
-                <Col span={8} key={item.contract_address}>
-                  <Card
-                    title={
-                      <div>
-                        <Avatar
-                          src={item.logo_url}
-                          style={{ margin: "0 10px" }}
-                        />
-                        <span>{item.contract_ticker_symbol}</span>
-                      </div>
-                    }
-                  >
-                    <p>{`balance: ${ethers.utils.formatUnits(
-                      item.balance,
-                      item.contract_decimals
-                    )}`}</p>
-                  </Card>
-                </Col>
+                <CardItem item={item} />
               ))}
             </Row>
           )}
@@ -111,24 +123,7 @@ export default function App() {
           {bscData?.items && bscData.items.length > 0 && (
             <Row gutter={16}>
               {bscData.items.map((item) => (
-                <Col span={8} key={item.contract_address}>
-                  <Card
-                    title={
-                      <div>
-                        <Avatar
-                          src={item.logo_url}
-                          style={{ margin: "0 10px" }}
-                        />
-                        <span>{item.contract_ticker_symbol}</span>
-                      </div>
-                    }
-                  >
-                    <p>{`balance: ${ethers.utils.formatUnits(
-                      item.balance,
-                      item.contract_decimals
-                    )}`}</p>
-                  </Card>
-                </Col>
+                <CardItem item={item} />
               ))}
             </Row>
           )}
